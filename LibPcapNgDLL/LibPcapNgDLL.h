@@ -13,7 +13,9 @@
 
 namespace LibPcapNg
 {
+	extern "C" {
 	enum endianness { BIG_ENDIAN, LITTLE_ENDIAN };
+
 
 	class FSFB2BSDpacket {
 	public:
@@ -21,7 +23,7 @@ namespace LibPcapNg
 		std::string IPdst;
 		int portsrc, portdst;
 		int timestampH, timestampL;
-		char* payload;
+		unsigned char* payload;
 		int sizePayLoad;
 		FSFB2BSDpacket *nextFSFB2BSDPacket;
 
@@ -43,8 +45,8 @@ namespace LibPcapNg
 		int nbFilteredPacket; // Keep track of the total number of packet found according to provided filter
 		std::string version;
 		int nbPacket; // Number of packets filtered
-	
-	public:		
+
+	public:
 		LIBPCAPNG_API FileManagement(std::string name_input);
 		LIBPCAPNG_API ~FileManagement();
 		LIBPCAPNG_API std::string getVersion();
@@ -55,8 +57,22 @@ namespace LibPcapNg
 		bool addFSFB2BSDPacket(std::string IPsrc, std::string IPdst, int portSrc, int portDst);
 		bool parseInterfaceDescription();
 		bool parseEnhancedPacketBlock(std::string IPsrc, std::string IPdst, int portSrc, int portDst);
-		LIBPCAPNG_API bool parsePcapNG(std::string ipSrc, std::string ipDst, int portSrc, int portDst);
-		LIBPCAPNG_API char* getFirstPacket();
-		LIBPCAPNG_API char* getNextPacket();
+		LIBPCAPNG_API int parsePcapNG(std::string ipSrc, std::string ipDst, int portSrc, int portDst);
+		LIBPCAPNG_API int getFirstPacket(unsigned char* &inputArray);
+		LIBPCAPNG_API int getNextPacket(unsigned char* &inputArray);
+
 	};
+		// Export of necessary methods to managed code to call from C#
+
+		LIBPCAPNG_API FileManagement* __cdecl MngConstruct(char* input);
+		LIBPCAPNG_API void __cdecl MngDispose(FileManagement* objectToDispose);
+		LIBPCAPNG_API const char* __cdecl MngGetVersion(FileManagement* objectToDispose, char* buffer);
+		LIBPCAPNG_API int MngGetFilteredPacketNumber(FileManagement* object);
+		LIBPCAPNG_API int MngParsePcapNG(FileManagement* object, char* ipSrc, char* ipDst, int portSrc, int portDst);
+		LIBPCAPNG_API bool MngLoad(FileManagement* object);
+		LIBPCAPNG_API const int MngGetFirstPacket(FileManagement* object, unsigned char* &buffer);
+		LIBPCAPNG_API const int MngGetNextPacket(FileManagement* object, unsigned char* &buffer);
+	}
+
+
 }
