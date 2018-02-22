@@ -42,9 +42,12 @@ namespace LibPcapNg
 		FSFB2BSDpacket* rootBSDptr; // Root of the list of filtered packets
 		FSFB2BSDpacket* lastBSDptr; // Keep track of the last BSD (for quick addition to linked list)
 		FSFB2BSDpacket* currentBSDptr; // Keep track of the current BSD (for navigating linked list)
+		double currentTimeStamp; // Keep track of the current timestamp of the pCap
 		int nbFilteredPacket; // Keep track of the total number of packet found according to provided filter
 		std::string version;
 		int nbPacket; // Number of packets filtered
+		
+		long double getTimeStamp(); // internal method to compute the current time stamp of the pCap
 
 	public:
 		LIBPCAPNG_API FileManagement(std::string name_input);
@@ -56,10 +59,13 @@ namespace LibPcapNg
 		bool addFSFB2BSDPacket();
 		bool addFSFB2BSDPacket(std::string IPsrc, std::string IPdst, int portSrc, int portDst);
 		bool parseInterfaceDescription();
-		bool parseEnhancedPacketBlock(std::string IPsrc, std::string IPdst, int portSrc, int portDst);
-		LIBPCAPNG_API int parsePcapNG(std::string ipSrc, std::string ipDst, int portSrc, int portDst);
+		bool parseEnhancedPacketBlock(std::string IPsrc, std::string IPdst, int portSrc, int portDst,
+			int srcNodeID, int dstNodeID);
+		LIBPCAPNG_API int parsePcapNG(std::string ipSrc, std::string ipDst, int portSrc, int portDst,
+			int srcNodeID, int dstNodeID);
 		LIBPCAPNG_API int getFirstPacket(unsigned char* &inputArray);
 		LIBPCAPNG_API int getNextPacket(unsigned char* &inputArray);
+		LIBPCAPNG_API long double getCurrentTimeStamp();
 
 	};
 		// Export of necessary methods to managed code to call from C#
@@ -68,10 +74,12 @@ namespace LibPcapNg
 		LIBPCAPNG_API void __cdecl MngDispose(FileManagement* objectToDispose);
 		LIBPCAPNG_API const char* __cdecl MngGetVersion(FileManagement* objectToDispose, char* buffer);
 		LIBPCAPNG_API int MngGetFilteredPacketNumber(FileManagement* object);
-		LIBPCAPNG_API int MngParsePcapNG(FileManagement* object, char* ipSrc, char* ipDst, int portSrc, int portDst);
+		LIBPCAPNG_API int MngParsePcapNG(FileManagement* object, char* ipSrc, char* ipDst, int portSrc, int portDst,
+			int srcNodeID, int dstNodeID);
 		LIBPCAPNG_API bool MngLoad(FileManagement* object);
 		LIBPCAPNG_API const int MngGetFirstPacket(FileManagement* object, unsigned char* &buffer);
 		LIBPCAPNG_API const int MngGetNextPacket(FileManagement* object, unsigned char* &buffer);
+		LIBPCAPNG_API const double MngGetTimeStamp(FileManagement* object);
 	}
 
 
